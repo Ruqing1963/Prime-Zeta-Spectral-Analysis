@@ -1,0 +1,238 @@
+\documentclass[11pt, a4paper]{article}
+
+% =================================================================
+% PACKAGES AND SETUP
+% =================================================================
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm} % Math symbols
+\usepackage{graphicx}                   % Figures
+\usepackage{geometry}                   % Margins
+\usepackage{hyperref}                   % Hyperlinks
+\usepackage{booktabs}                   % Professional tables
+\usepackage{caption}                    % Caption formatting
+\usepackage{float}                      % Force figure placement [H]
+\usepackage{authblk}                    % Author affiliation
+\usepackage{lineno}                     % Line numbers for final check
+\usepackage{cite}                       % Citation management
+
+% Page Margins
+\geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+
+% =================================================================
+% TITLE AND AUTHOR INFO
+% =================================================================
+\title{\textbf{Numerical Investigation of Spectral Correlations between Prime Number Distribution and Riemann Zeta Zeros}}
+
+\author{Ruqing Chen}
+\affil{GUT Geoservice Inc., Montreal, Canada}
+\affil{\textit{Email: ruqing@hotmail.com}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% =================================================================
+% ABSTRACT
+% =================================================================
+\begin{abstract}
+We present an exploratory data analysis concerning the local distribution of prime numbers and their correlation with the imaginary parts of Riemann zeta zeros ($\gamma_n$). Through large-scale numerical simulations ($N=1.5 \times 10^8$), we evaluate a heuristic capture model derived from the Explicit Formula. Our analysis reveals three distinct regimes: (1) a \textbf{Correlation Regime} where a dual-frequency model enhances prime detection; (2) a \textbf{Divergence Regime} driven by cumulative phase errors; and (3) a recovery phase via \textbf{Iterative Correction}. 
+
+To rigorously address concerns regarding parameter overfitting, we implemented a comprehensive validation framework. A \textbf{True Null Model} simulation ($M=10,000$), in which phase parameters were randomized ($\phi \sim U[0, 2\pi]$), suggests that the specific phases of Riemann zeros encode statistically significant structural information ($p < 10^{-4}$). These findings provide strong numerical evidence supporting the spectral determinism of prime distribution in local intervals.
+\end{abstract}
+
+% Line numbers
+\linenumbers
+
+% =================================================================
+% 1. INTRODUCTION
+% =================================================================
+\section{Introduction}
+The Riemann Explicit Formula establishes a deep connection between the prime counting function $\pi(x)$ and the zeros of the Riemann Zeta function $\zeta(s)$ \cite{Riemann1859}. While the analytical properties are well-established \cite{Montgomery1973}, the local numerical behavior of truncated spectral sums remains a subject of active research \cite{Odlyzko1987, Platt2021}.
+
+In this study, we treat the prime sequence as a discrete signal driven by frequencies $\gamma_n$. \textbf{We explicitly acknowledge that the capture function $C(p)$ utilized in this work is a heuristic construct.} It is designed to numerically test spectral correlations rather than to serve as a formal derivation from analytic number theory. Our primary objective is to quantify the limits of low-order spectral approximations and verify their statistical robustness against random fluctuations.
+
+% =================================================================
+% 2. METHODOLOGY AND PARAMETER JUSTIFICATION
+% =================================================================
+\section{Methodology and Parameter Justification}
+\label{sec:method}
+
+We define a heuristic capture function $C(p)$ to test the spectral correlation between prime locations $p$ and zeta zeros $\gamma_n$:
+\begin{equation}
+    C(p) = \left\lfloor A \cdot p^{-\zeta} \cdot \sum_{n=1}^{k} \cos(\gamma_n \ln p + \phi_n) \right\rfloor \pmod 2
+\end{equation}
+where $k=2$ for the dual-frequency model.
+
+\textbf{Justification of Parameters:}
+To ensure reproducibility and address concerns of overfitting, we strictly define the selection criteria for all parameters:
+
+\begin{itemize}
+    \item \textbf{Phases ($\phi_n = 0$):} We explicitly set all phase parameters $\phi_n$ to $0$. This is not an arbitrary choice but is derived from the theoretical structure of the Riemann Explicit Formula, where the oscillatory terms correspond to the real part of $x^{\rho} = x^{0.5}e^{i\gamma \ln x}$, which behaves as $\cos(\gamma \ln x)$. By fixing $\phi_n=0$, we ensure that the model relies solely on the intrinsic spectral information of $\gamma_n$ rather than tuned phase offsets.
+    \item \textbf{Amplitude ($A=2.0$):} Selected as a normalization constant. Since the sum of two cosine terms ranges in $[-2, 2]$, a scalar of $A=2.0$ ensures the signal amplitude is sufficient to trigger the non-linear floor function transitions.
+    \item \textbf{Damping Factor ($\zeta=0.1$):} Selected empirically to counteract the logarithmic density decrease of primes ($1/\ln p$) while maintaining a sufficient Signal-to-Noise Ratio (SNR) for numerical detection.
+\end{itemize}
+
+% =================================================================
+% 3. ANALYSIS OF SPECTRAL REGIMES
+% =================================================================
+\section{Analysis of Spectral Regimes}
+
+\subsection{Phase I: Correlation Regime}
+We first analyzed the efficiency of the model using the first two zeros ($\gamma_1 \approx 14.13, \gamma_2 \approx 21.02$).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Fig1_coherence.png}
+    \caption{\textbf{Enhanced Prime Detection via Spectral Correlation.} The red curve (Dual-Frequency Model) consistently yields a higher cumulative count of "captured" primes compared to the Single-Frequency Model (blue).}
+    \label{fig:correlation}
+\end{figure}
+
+As illustrated in \textbf{Figure \ref{fig:correlation}}, the Dual-Frequency model outperforms the Single-Frequency baseline.
+
+\subsection{Phase II: Phase Divergence}
+Finite approximations of the Explicit Formula inevitably suffer from truncation errors.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Fig2_drift.png}
+    \caption{\textbf{Model Divergence due to Cumulative Phase Error.} The solid line represents the observed model performance, while the dashed line represents the theoretical error accumulation.}
+    \label{fig:divergence}
+\end{figure}
+
+\subsection{Phase III: Iterative Correction}
+To extend the validity range of the model, we implemented an \textbf{Iterative Correction} strategy.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Fig3_relay.png}
+    \caption{\textbf{Model Recovery via Iterative Correction.} The red curve demonstrates the efficacy of the Iterative Correction strategy.}
+    \label{fig:correction}
+\end{figure}
+
+% =================================================================
+% 4. STATISTICAL VALIDATION
+% =================================================================
+\section{Statistical Validation}
+\label{sec:stats}
+
+\subsection{Paired T-Test}
+We first applied a \textbf{Paired T-Test (One-tailed)} comparing the Prime Yield of the Dual-Frequency Model against the Single-Frequency Baseline ($N=99$).
+
+\begin{table}[H]
+    \centering
+    \caption{\textbf{Statistical Hypothesis Test Results (Real Dataset).}}
+    \label{tab:stats}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Statistical Metric} & \textbf{Value} \\
+        \midrule
+        Sample Size ($N$) & 99 \\
+        Mean Difference (Dual - Single) & +1467.3 \\
+        T-Statistic & 12.38 \\
+        \textbf{P-Value} & \textbf{$< 10^{-21}$} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The negligible p-value (Table \ref{tab:stats}) indicates a robust improvement.
+
+\subsection{True Null Model Validation (Random Phase Simulation)}
+\label{sec:null_model}
+
+To specifically address the risk of parameter overfitting, we constructed a \textbf{True Randomized Null Model}.
+
+\textbf{Protocol:} We performed $M=10,000$ independent simulations. In each simulation, the phases were replaced with random variables $\phi_{rand} \sim U[0, 2\pi]$, while keeping all other parameters constant.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Fig4_True_NullModel.png}
+    \caption{\textbf{True Null Model Validation.} The gray histogram shows the distribution of gain differences from 10,000 simulations using random phases. The red vertical line marks the observed gain from the actual Riemann zeros ($+1467.3$). The observed value is more than \textbf{3 times larger} than the maximum random fluctuation ($+465.3$), providing strong evidence that the result is driven by the intrinsic phase definitions of the Riemann zeros.}
+    \label{fig:null_model}
+\end{figure}
+
+The results (Fig. \ref{fig:null_model}) strongly suggest that the correlation is significant ($p < 10^{-4}$).
+
+% =================================================================
+% 5. DISCUSSION
+% =================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+The results presented in this study offer a numerical perspective on the connection between the "music of the primes" and the spectral properties of the Riemann zeta function. By implementing a heuristic capture function, we have demonstrated that even low-order truncations of the Riemann spectrum can locally approximate prime distribution patterns with high statistical significance ($p < 10^{-21}$).
+
+\subsection{Theoretical Context and Comparisons}
+The standard approximation for the prime counting function is given by the Prime Number Theorem (PNT) as $\pi(x) \sim Li(x)$. While PNT describes the "smooth" average behavior, the Riemann Explicit Formula describes the oscillations around this mean. Our dual-frequency model ($k=2$) effectively visualizes the first two terms of this oscillatory expansion. The "Constructive Interference" observed in Figure \ref{fig:correlation} aligns with the theoretical expectation that primes are not randomly distributed but follow a rigid spectral clock, as described by Montgomery's Pair Correlation Conjecture \cite{Montgomery1973} and later modeled by Random Matrix Theory (RMT) \cite{Keating2000}.
+
+Unlike probabilistic models such as the Cramér model, which assumes primes behave like random coin tosses with probability $1/\ln x$, our results highlight the deterministic nature of prime fluctuations. The success of our model with fixed phases ($\phi_n=0$) reinforces the view that the randomness in prime distribution is "pseudo-randomness" generated by an underlying arithmetic order \cite{GreenTao2008}.
+
+\subsection{Limitations of the Heuristic Approach}
+While the correlations are statistically significant, several limitations must be acknowledged. First, the heuristic function $C(p)$ uses a non-linear floor-mod-2 filter, which simplifies the analytic signal but introduces potential artifacts. Second, the damping factor $\zeta=0.1$ is an empirical choice optimized for the finite simulation range ($N=1.5 \times 10^8$); theoretically, the critical line dictates $\zeta=0.5$, but this would result in a signal too weak to detect with simple numerical sieves at this scale.
+
+Furthermore, as shown in Figure \ref{fig:divergence}, phase coherence is transient in finite approximations. This "Phase Divergence" is a predictable consequence of truncating the infinite sum in the Explicit Formula. As $x$ increases, higher-order zeros ($\gamma_n$ for large $n$) become increasingly significant \cite{Odlyzko1987}. Our "Iterative Correction" strategy successfully mitigated this in the short term, but a scalable solution for very large $N$ would require incorporating thousands of zeros, computationally similar to the methods used in modern verification of the Riemann Hypothesis \cite{Platt2021}.
+
+\subsection{Implications for Future Research}
+The strong separation between the observed signal and the Null Model (Figure \ref{fig:null_model}) suggests that heuristic spectral filters could serve as efficient tools for detecting "prime-like" structures in large datasets without full primality testing. Future work could investigate applying machine learning techniques to dynamically optimize the weighting of higher-order zeros, potentially extending the predictive range of such models indefinitely.
+
+% =================================================================
+% 6. CONCLUSION
+% =================================================================
+\section{Conclusion}
+Our numerical investigation provides strong evidence that:
+\begin{enumerate}
+    \item \textbf{Statistical Significance:} The correlation between low-order Riemann zeros and prime locations is robust ($p < 10^{-21}$) and consistent across different data segments.
+    \item \textbf{Intrinsic Nature:} The True Null Model validation provides strong evidence that the signal arises from the specific phase information of $\gamma_n$, strongly ruling out random parameter overfitting.
+    \item \textbf{Fixed Parameters:} The use of theoretical phases ($\phi_n=0$) ensures that the results reflect the underlying number-theoretic structure.
+\end{enumerate}
+
+These findings support the utility of spectral methods in exploring the fine-grained statistics of the prime number sequence.
+
+% =================================================================
+% 7. DATA AVAILABILITY
+% =================================================================
+\section*{Data and Code Availability}
+The datasets generated during the current study and the Python implementation of the capture function are available in the GitHub repository: \url{https://github.com/Ruqing1963/Prime-Zeta-Spectral-Analysis}. The repository explicitly documents the use of fixed phase parameters ($\phi_n=0$).
+
+% =================================================================
+% 8. REFERENCES
+% =================================================================
+\begin{thebibliography}{99}
+
+\bibitem{Riemann1859}
+B. Riemann, 
+"Ueber die Anzahl der Primzahlen unter einer gegebenen Grösse," 
+\textit{Monatsberichte der Berliner Akademie}, 1859.
+
+\bibitem{Montgomery1973}
+H. L. Montgomery, 
+"The pair correlation of zeros of the zeta function," 
+\textit{Proc. Sympos. Pure Math.}, vol. 24, pp. 181-193, 1973.
+
+\bibitem{Odlyzko1987}
+A. M. Odlyzko, 
+"On the distribution of spacings between zeros of the zeta function," 
+\textit{Mathematics of Computation}, vol. 48, no. 177, pp. 273-308, 1987.
+
+\bibitem{Keating2000}
+J. P. Keating and N. C. Snaith,
+"Random matrix theory and $\zeta(1/2+it)$,"
+\textit{Communications in Mathematical Physics}, vol. 214, no. 1, pp. 57-89, 2000.
+
+\bibitem{GreenTao2008}
+B. Green and T. Tao,
+"The primes contain arbitrarily long arithmetic progressions,"
+\textit{Annals of Mathematics}, vol. 167, no. 2, pp. 481-547, 2008.
+
+\bibitem{Platt2021}
+D. Platt and T. Trudgian,
+"The Riemann hypothesis is true up to $3 \cdot 10^{12}$,"
+\textit{Bulletin of the London Mathematical Society}, vol. 53, no. 3, pp. 792-797, 2021.
+
+\bibitem{Ford2014}
+K. Ford, B. Green, S. Konyagin, and T. Tao,
+"Large gaps between consecutive prime numbers,"
+\textit{Annals of Mathematics}, vol. 180, no. 1, pp. 91-133, 2014.
+
+\end{thebibliography}
+
+\end{document}
