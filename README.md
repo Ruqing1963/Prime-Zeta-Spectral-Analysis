@@ -32,4 +32,38 @@ To ensure reproducibility and rule out parameter tuning (overfitting), the captu
 ### 1. Install dependencies
 ```bash
 pip install numpy pandas matplotlib seaborn scipy
+```
 
+### 2. Run the Null Model Validation
+```bash
+python NullModel_Validation.py
+```
+This script will generate the statistical validation report and `Fig4_True_NullModel.png`.
+
+## 📜 Citation
+
+If you use this code or data in your research, please cite the following paper:
+
+> **Chen, R.** (2025). Numerical Investigation of Spectral Correlations between Prime Number Distribution and Riemann Zeta Zeros. *[Journal Name]*. (Accepted for Publication).
+
+**BibTeX:**
+
+```bibtex
+@article{Chen2025,
+  author = {Chen, Ruqing},
+  title = {Numerical Investigation of Spectral Correlations between Prime Number Distribution and Riemann Zeta Zeros},
+  journal = {[Journal Name]},
+  year = {2025},
+  note = {Accepted for Publication}
+}
+```
+
+## 📧 Contact
+
+If you have any questions regarding the code or the paper, please feel free to contact:
+
+* **Ruqing Chen**: `ruqing@hotmail.com`
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
